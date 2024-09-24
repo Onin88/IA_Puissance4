@@ -1,0 +1,96 @@
+Premièrement on va créer des structures :
+
+    Etat : qui permettra de récupérer l'état du jeu en cours,
+    quel joueur est en train de jouer, et l'état du plateau du jeu.
+
+    Coup : qui permettra de faire un coup, donc ici seule la colonne est Utilisez
+    car au puissa,ce 4 on joue dans les colonnes et non dans les lignes.
+
+Dans le main :
+
+    On va initaliser le plateau de jeu grâce à la fonction etat_initial(void)
+    qui va allouer de l'espace pour une structure Etat, au début, le joueur va
+    être mis comme joueur qui commence, ensuite on va remplir chaque case de notre plateau
+    de jeu de vide (càd ' ').
+
+    Ensuite, on va nous demander de choisir qui veut commencer, l'humain ou l'ordinateur,
+    pour ensuite changer le joueur (qui était au début l'humain) à celui qui a été choisit.
+
+    Suite à cela, nous allons rentrer dans la boucle du jeu qui va afficher le plateau avec 
+    la fonction afficheJeu(Etat *etat), celle-ci affiche les numéros des colonnes en Premièrement
+    puis va afficher à chaque ligne les délimitations des colonnes, puis va refaire des lignes de séparation
+    pour faire une forme de carré pour chaque chase.
+
+    Puis, on va regarder qui doit jouer, si c'est l'humain, alors tant qu'il n'a pas fais un coup
+    valide par rapport au plateau de jeu actuel alors on va lui redemander un Coup grâce à la fonction
+    demanderCoup(Etat *etat) : qui va demander quelle colonne est choisi par l'humain
+    pour ensuite s'assurer que la colonne est dans les limites du plateau, suite à cela on va
+    rechercher la première ligne vide de la colonne (car les pièces descendent dans la ligne la plus 
+    basse de la colonne choisie).
+
+    Suite à cela si c'est au tour de l'ordinateur alors l'algo MCTS sera executé en lançant la fonction
+    ordi_joue_mcts(Etat * etat, int tempsmax) : qui va initaliser une variable qui mesurera le temps,
+    ensuite on va créer l'arbre de recherche, créer les premiers noeuds et rentrer dans l'algorithme MCTS-UCT
+    qui va s'executer autant de fois que possible en un tempsmax choisi en constante.
+    Nous allons tout d'abord faire la Sélection du noeud par rapport à la racine :
+    On va parcourir l'arbre jusqu'à un noeud feuille, on va parcourir les enfants pour sélectionner le meilleur,
+    calculer l'UCT de l'enfant et choisir l'enfant avec le plus grand UCT, si aucun enfant n'est visité alors
+    on va choisir le premier enfant non visité. 
+    Ensuite, on va faire l'expansion du noeud choisi, càd ajouter les enfants du noeud et on va choisir un enfant
+    aléatoirement.
+    Ensuite, on va faire la simulation du noeud choisi, càd simuler un jeu jusqu'à la fin en choisissant des coups
+    aléatoirement et retourner le résultat de la simulation.
+    Enfin, on va faire la rétropropagation du résultat de la simulation, càd mettre à jour les statistiques des
+    noeuds parcourus et remonter jusqu'à la racine.
+
+    Suite à cela, on va choisir le meilleur coup par rapport à la racine, càd choisir le noeud avec la plus grande chance
+    de victoire, et on va retourner le meilleur coup.
+
+    Ensuite, on va jouer le coup choisi par l'ordinateur, et on va changer le joueur qui doit jouer, en affichant
+    la probabilité de victoire de l'ordinateur et le nombre de simulations fais par l'ordinateur.
+
+    On va afficher le plateau de jeu à chaque tour de boucle.
+
+    La boucle va continuer jusqu'à ce qu'il y ait un gagnant ou un match nul, et afficher l'état du jeu.
+    Si l'ordi gagne on va afficher "L'ordinateur a gagné", si l'humain gagne on va afficher "L'humain a gagné",
+    et si c'est un match nul on va afficher "Match nul".
+
+Question 3 : Implémentez l’amélioration des simulations consistant à toujours choisir un coup gagnant lorsque cela est possible.
+Comparez la qualité de jeu de cette nouvelle version avec la précédente et expliquez à quoi cela est dû.
+
+On va ajouter une fonction qui va vérifier si un coup est gagnant, si oui alors on va choisir ce coup et ne pas utiliser
+le coup qu'aurait choisi l'algo MCTS-UCT, car cet algo est probabiliste donc il est possible que s'il n'a pas assez de temps
+pour simuler tous les coups favorables, ici dits "gagnants", alors il ne les choisira pas forcément. Tandis que si on choisit
+un coup gagnant alors on est sûr de gagner, donc cela améliore la qualité de jeu de l'ordinateur, lorsqu'il existe un coup gagnant.
+Cela nous évite aussi de devoir attendre une simulation alors qu'on peut juste checker s'il y a un coup gagnant.
+
+Question 4 : Si vous travaillez en C, quelle est l’utilité ici de compiler avec gcc -O3 plutôt qu’avec les
+options par défaut ? Donnez des exemples illustratifs.
+
+L'utilité de compiler avec gcc -O3 est que cela va optimiser le code, càd les boucles, les appels de fonctions et les registres donc le rendre plus rapide, et cela va aussi
+optimiser l'espace mémoire, donc le rendre plus petit. 
+
+Exemple : 
+    Lorsque c'est au tour de l'ordinateur de jouer, on va lancer l'algo MCTS-UCT, et si on compile avec gcc -O3 alors cela va optimiser tout le code en lien avec cet algo, donc
+    l'algo pourra s'executer plus rapidement et donc l'ordinateur aura plus de simulations donc plus de choix et de probabilité de gagner en choisissant le coup le plus optimal.
+
+
+Question 5 : Comparez les critères "max" et "robuste" pour choisir le coup à jouer en fin d’algorithme.
+Conduisent-ils souvent à des coups différents ? Lequel paraît donner la meilleure performance ?
+
+Le critère "max" va choisir le coup qui a le plus de chance d'amener à une victoire, alors que le critère "robuste" 
+va choisir le coup qui a le plus de chance de ne pas perdre.
+Ces deux critères amènent plutôt souvent à des coups différents.
+Celui qui paraît donner la meilleure performance est le critère "robuste" car il va choisir le coup qui a le plus de chance
+de ne pas perdre, ce qui donne une impression qu'il ne perd pas souvent car il va jouer sûrement plus longtemps.
+
+    
+Question 6 : Donnez une estimation du temps de calcul nécessaire pour jouer le premier coup avec
+l’algorithme Minimax (sans alpha-beta ni limitation de profondeur) :
+
+Comme le plateau de jeu fais 6 lignes et 7 colonnes alors on peut faire le calcul
+6^7 = 78 364 164 pour déterminer l'espace de rechercher sans compter que des positions
+sont impossibles à certains état du plateau de jeu.
+Ce qui fait un temps de calcul pour un ordinateur à 3GHz de 78 364 164 / 3 000 000 000 = 0.026 secondes pour un coup.
+donc pour 78 Millions de coup cela fait 78 364 164 * 0.026 = 2 036 366 secondes soit 23 jours.
+Donc pour jouer un coup cela prendrait 23 jours.
